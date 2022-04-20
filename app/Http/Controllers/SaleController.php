@@ -64,8 +64,8 @@ class SaleController extends Controller
     }
     public function salePdfitemwise($from_date, $to_date, $vendor_id, $invoice_number)
     {
-        $query = DB::table('sales')->join('ag', 'sales.vendor_id', '=', 'vendors.id')
-            ->select('sales.*', 'vendors.name as vendor_name')->where('sales.branch', Auth::user()->branch);
+        $query = DB::table('sales')
+            ->select('sales.*')->where('sales.branch', Auth::user()->branch);
         if ($from_date != 'none' && $to_date != 'none') {
             $query->whereBetween('sales.invoice_date', [$from_date, $to_date]);
         }
@@ -92,7 +92,7 @@ class SaleController extends Controller
         );
       
 
-        $pdf = PDF::loadView('sales.salewiseitemlistPdf', $data);
+        $pdf = PDF::loadView('sales.salewiselistitemPdf', $data);
         return $pdf->stream('pagePdf.pdf');
     }
     public function searchSaleitemwise(Request $request)
