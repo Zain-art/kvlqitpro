@@ -14,7 +14,7 @@ class CreateSalesReturnTable extends Migration
     public function up()
     {
         Schema::create('sales_return', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id') ;
             $table->integer('customer_id');
             $table->string('net_total');
             $table->binary('items_detail');

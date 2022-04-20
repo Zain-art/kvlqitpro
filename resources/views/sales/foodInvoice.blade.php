@@ -284,16 +284,7 @@
                                                 </div>
 
 
-                                                <!-- <div class="col-md-7">
-                                                    <select class="js-example-basic-single form-control commission_persent" placeholder="Select agents" name="commisssion" id="commission_persent" onchange="calculateSum();GetAgentCommission();">
-                                                        <option value="">Select Commission</option>
-                                                        @if(!empty($agentlists))
-                                                        @foreach($agentlists as $agent)
-                                                        <option value="{{$agent->Commission_persent}}" {{(isset($sale)) ? ($sale->agent_id == $agent->id) ? 'Selected' : '' : ''}}> {{$agent->Commission_persent}} </option>
-                                                        @endforeach
-                                                        @endif
-                                                    </select>
-                                                </div> -->
+                                              
                                             </div>
                                         </div>
                                     </div>

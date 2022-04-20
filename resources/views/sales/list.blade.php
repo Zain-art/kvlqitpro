@@ -97,7 +97,7 @@
                                     <th class="text-center">Invoice #</th>
                                     <th class="text-center">Customer Name</th>
                                     <th class="text-center">Net Total</th>
-                                    <!-- <th class="text-center">Net PCS</th> -->
+                                     <th class="text-center">Net PCS</th> 
                                     <th class="text-center">Net Qty</th>
                                     <th class="text-center">Invoice Date</th>
                                     <th class="text-center">Travel Agents</th>
@@ -119,11 +119,11 @@
                                     <td class="text-center text-muted " style="color:{{$list->customer_status == 2 ? '' : 'white !important'}};">{{$list->invoice_number}}</td>
                                     <td class="text-center">{{$list->customer_name}}</td>
                                     <td class="text-center">{{$list->net_total}} </td>
-                                    <!-- <td class="text-center">{{$list->net_pcs}} </td> -->
+                                  <td class="text-center">{{$list->net_pcs}} </td> 
                                     <td class="text-center">{{$list->net_qty}} </td>
                                     <td class="text-center">{{$list->invoice_date}}</td>
-                                    <td class="text-center">{{$list->Name}}</td>
-                                    <td class="text-center">{{$list->Commission_persent}}</td>
+                                    <td class="text-center">{{$list->agent_name}}</td>
+                                    <td class="text-center">{{$list->commission_persent}}</td>
                                     <td class="text-center">{{$list->commission_amount}}</td>
                                     <td class="text-center">{{$list->zakat}}</td>
                                     <td class="text-center">{{$list->sadqa}}</td>
@@ -177,7 +177,9 @@
                                 <input type="text" value="{{(isset($net_qty)) ? $net_qty : ''}}" class="form-control mb-4" style="width: 130px;" readonly>
                             </div> -->
                             <div>
+                            @if(isset($salelist))
                                 {{ $salelist->links() }}
+                                @endif
                             </div>
                         </div>
                     </div>

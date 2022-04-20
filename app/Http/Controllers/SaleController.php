@@ -22,13 +22,13 @@ class SaleController extends Controller
         $Queries = array();
         $list = DB::table('sales')
             ->join('customers', 'sales.customer_id', '=', 'customers.id')
-            ->join('travel_agents', 'sales.agent_id', '=', 'travel_agents.id')
+            ->leftjoin('travel_agents', 'sales.agent_id', '=', 'travel_agents.id')
             ->select(
                 'sales.*',
                 'customers.name as customer_name',
                 'customers.status as customer_status',
-                'travel_agents.Name',
-                'travel_agents.Commission_persent',
+                'travel_agents.Name as agent_name',
+                'travel_agents.Commission_persent as commission_persent',
                 'sales.commission_amount'
             )
 
@@ -44,6 +44,92 @@ class SaleController extends Controller
         $sadqa = DB::table('sales')->sum('sadqa');
         return view('sales.list', array('salelist' => $list, 'queries' => $Queries, 'customers' => $customers, 'net_total' => $net_total, 'net_pcs' => $net_pcs, 'net_qty' => $net_qty, 'agentlist' => $agentlist, 'commissionsum' => $commissionsum, 'zakat' => $zakat, 'sadqa' => $sadqa));
     }
+    public function salewiseitemlist()
+    {
+        $list = DB::table('sales')
+            ->where('sales.branch', Auth::user()->branch)
+            ->orderByDesc('sales.id')
+            ->paginate(20);
+        $items = DB::table('items')->get();
+        $net_total = DB::table('sales')->sum('net_total');
+        $net_qty = DB::table('sales')->sum('net_qty');
+        $net_pcs = DB::table('sales')->sum('net_pcs');
+        // $agents = DB::table('travel_agents')->get();
+        
+        // echo "<pre>";
+        // print_r($list);
+        // exit;
+        $items = DB::table('items')->get();
+        return view('sales.salewiseitemlist', array('salewiseitemlist' => $list, 'items' => $items, 'net_total' => $net_total, 'items' => $items, 'net_qty' => $net_qty, 'net_pcs' => $net_pcs));
+    }
+    public function salePdfitemwise($from_date, $to_date, $vendor_id, $invoice_number)
+    {
+        $query = DB::table('sales')->join('ag', 'sales.vendor_id', '=', 'vendors.id')
+            ->select('sales.*', 'vendors.name as vendor_name')->where('sales.branch', Auth::user()->branch);
+        if ($from_date != 'none' && $to_date != 'none') {
+            $query->whereBetween('sales.invoice_date', [$from_date, $to_date]);
+        }
+        if ($invoice_number != 'none') {
+            $query->where('sales.invoice_number', 'like', "%$invoice_number%");
+        }
+        if ($vendor_id != 'none') {
+            $query->where('vendors.id', "$vendor_id");
+        }
+        $list = $query->orderByDesc('sales.id')->get();
+        $net_total = $query->sum('net_total');
+        $net_qty =  $query->sum('net_qty');
+        $net_pcs =  $query->sum('net_pcs');
+        $companyinfo = DB::table('companyinfo')->first();
+        $companyinfo->logo = url('/') . $companyinfo->logo;
+        $items = DB::table('items')->get();
+        $data = array(
+            'salelist' => $list,
+            'companyinfo' => $companyinfo,
+            'net_total' => $net_total,
+            'net_qty' => $net_qty,
+            'items' => $items,
+            'net_pcs' => $net_pcs,
+        );
+      
+
+        $pdf = PDF::loadView('sales.salewiseitemlistPdf', $data);
+        return $pdf->stream('pagePdf.pdf');
+    }
+    public function searchSaleitemwise(Request $request)
+    {
+        $Queries = array();
+        if (empty($request->from_date) && empty($request->to_date) && empty($request->agent_id) && empty($request->invoice_number)) {
+            return redirect('sales/list');
+        }
+        $query = DB::table('sales');
+        // $query->join('travel_agents', 'sales.agent_id', '=', 'travel_agents.id');
+        $query->select('sales.*')->whereBetween('invoice_date',[$request->from_date,$request->to_date]);
+        if (isset($request->invoice_number) && !empty($request->invoice_number)) {
+            $Queries['invoice_number'] = $request->invoice_number;
+            $query->where('sales.invoice_number', 'like', "%$request->invoice_number%");
+        }
+
+        if (isset($request->from_date) && isset($request->to_date)) {
+            $Queries['from_date'] = $request->from_date;
+            $Queries['to_date'] = $request->to_date;
+            $query->whereBetween('sales.invoice_date', [$request->from_date, $request->to_date]);
+        }
+        if (isset($request->agent_id)) {
+            $Queries['agent_id'] = $request->agent_id;
+            $query->where('travel_agents.id', "$request->agent_id");
+        }
+
+        $result = $query->where('sales.branch', Auth::user()->branch)->orderByDesc('sales.id')->paginate(20);
+        $result->appends($Queries);
+        $net_total = $query->sum('net_total');
+        $net_pcs = $query->sum('net_pcs');
+        $net_qty = $query->sum('net_qty');
+        $vendors = DB::table('travel_agents')->get();
+        $items = DB::table('items')->get();
+        return view('sales.salewiseitemlist', array('salewiseitemlist' => $result, 'from_date' => $request->from_date, 'to_date' => $request->to_date, 'vendor_id' => $request->vendor_id, 'invoice_number' => $request->invoice_number, 'queries' => $Queries, 'net_total' => $net_total, 'net_qty' => $net_qty,'items'=>$items, 'net_pcs' => $net_pcs, 'vendors' => $vendors));
+    }
+
+
     public function newsale()
     {
         $customers = DB::table('customers')->where('status', 1)->where('branch', Auth::user()->branch)->get();
@@ -209,6 +295,16 @@ class SaleController extends Controller
                 }
 
                 $i++;
+            }
+            $is_booked=0;
+            if($is_booked==1){
+                $validator = Validator::make(
+                  
+                    [
+                       
+                        'is_booked' => 'item is already booked ',
+                    ]
+                );
             }
             if (isset($request->customer_id)) {
                 $customer = DB::table('customers')->where('id', $request->customer_id)->first();
@@ -657,7 +753,8 @@ class SaleController extends Controller
         }
         $query = DB::table('sales');
         $query->join('customers', 'sales.customer_id', '=', 'customers.id');
-        $query->select('sales.*', 'customers.name as customer_name', 'customers.status as customer_status');
+        $query->join('travel_agents', 'sales.customer_id', '=', 'travel_agents.id');
+        $query->select('sales.*', 'customers.name as customer_name', 'customers.status as customer_status','travel_agents.Name as agent_name','travel_agents.Commission_persent as commission_persent');
 
         if (!empty($request->from_date) && !empty($request->to_date)) {
             $Queries['from_date'] = $request->from_date;
@@ -688,7 +785,7 @@ class SaleController extends Controller
     {
         $sale = DB::table('sales')->where('sales.id', $id)
             ->leftJoin('customers', 'sales.customer_id', '=', 'customers.id')
-            ->join('travel_agents', 'sales.agent_id', '=', 'travel_agents.id')
+            ->leftjoin('travel_agents', 'sales.agent_id', '=', 'travel_agents.id')
             ->select('sales.*', 'customers.name', 'customers.phone', 'customers.email', 'customers.address', 'customers.general_ledger_account_id', 'travel_agents.Commission_persent')
             ->first();
 
@@ -1089,4 +1186,5 @@ class SaleController extends Controller
        
  
     }
+ 
 }

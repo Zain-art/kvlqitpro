@@ -84,6 +84,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/sales/pagepdf/{from_date}/{to_date}/{customer_id}/{invoice_number}', [SaleController::class, 'salePagePDF'])->name('salePagePdf');
     Route::get('invoiceList/data', [SaleController::class, 'getInvoiceList'])->name('getData');
     Route::post('invoice/data', [SaleController::class, 'getSingleInvoiceData']);
+    Route::get('/sale/list/item', [SaleController::class, 'salewiseitemlist'])->name('salewiseitemlist');
+    Route::any('/searchSaleitemwise/searchResults', [SaleController::class, 'searchSaleitemwise'])->name('searchSaleitemwise');
+    Route::get('/salePdfitemwise/salePagePdf/{from_date}/{to_date}/{vendor_id}/{invoice_number}', [SaleController::class, 'salePdfitemwise'])->name('salePdfitemwise');
     Route::get('invoice/getNumber', [SaleController::class, 'getNextInvoiceNumber']);
     Route::get('invoice/refund/{id}', [SaleController::class, 'invoiceRefund']);
 

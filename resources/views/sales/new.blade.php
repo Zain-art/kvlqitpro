@@ -150,6 +150,7 @@
                                             <td class="text-center"><input name="item_price[]" id="item_price" placeholder="Price" value="{{(isset($sale)) ? $invoiceItem['item_price'] : ''}}" type="text" class="form-control item_price" onchange="calculateInvoiceSum();"></td>
                                       
                                             <td class="text-center"><input name="item_qty[]" id="item_qty" placeholder="Quantity" value="{{(isset($sale)) ? $invoiceItem['item_qty'] : ''}}" type="text" class="form-control item_qty item_qt" onchange="qtySum();calculateInvoiceSum();"></td>
+                                            <td class="text-center"><input name="item_pcs[]" id="item_pcs" placeholder="Piceses" value="{{(isset($sale)) ? $invoiceItem['item_pcs'] : ''}}" type="text" class="form-control item_qty item_qt" onchange="qtySum();calculateInvoiceSum();"></td>
                                             <td class="text-center"><input name="amount[]" id="amount" placeholder="Total Amount" value="{{(isset($sale)) ? $invoiceItem['amount'] : ''}}" type="text" class="form-control amount" readonly></td>
                                            
 

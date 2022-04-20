@@ -50,9 +50,9 @@
                                     <label for="name" class="">Module</label>
                                     <select name="module" id="" class="form-control">
                                         <option disabled selected>Select</option>
-                                        @if(isset($menu))
-                                        @foreach($menu as $module)
-                                        <option value="{{$module->id}}">{{$module->module}}</option>
+                                        @if(isset($modules))
+                                        @foreach($modules as $module)
+                                        <option value="{{$module->id}}">{{$module->name}}</option>
                                         @endforeach
                                         @endif
                                     </select>

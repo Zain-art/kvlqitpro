@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddAgentIdToSalesTable extends Migration
+class AddNetPcsToSalesReturnTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddAgentIdToSalesTable extends Migration
      */
     public function up()
     {
-        Schema::table('sales', function (Blueprint $table) {
-            $table->string('agent_id');
+        Schema::table('sales_return', function (Blueprint $table) {
+            $table->string('net_pcs')->after('net_total');
         });
     }
 
@@ -25,8 +25,8 @@ class AddAgentIdToSalesTable extends Migration
      */
     public function down()
     {
-        Schema::table('sales', function (Blueprint $table) {
-            $table->dropIfExists('agent_id');
+        Schema::table('sales_return', function (Blueprint $table) {
+            //
         });
     }
 }

@@ -907,7 +907,7 @@ function GetAgentCommission() {
      let url = `${window.location.origin}/travelagent/commission/${id}`;
     
      
-     console.info(url);
+    //  console.info(url);
     
 
    
@@ -921,9 +921,10 @@ function GetAgentCommission() {
 
         success:
             function (response) {
-                if (response.success==true) {
+                if (response.success==200) {
                    $('.commission_persent').val(response.commission_persent);
                    calculateSum();
+                  
                 }
                
             },
@@ -932,9 +933,4 @@ function GetAgentCommission() {
         },
     });
 
-}
-function activeitem(){
-    let activeitem=document.getElementByClass('activeitem');
-    alert(activeitem);
-    
 }

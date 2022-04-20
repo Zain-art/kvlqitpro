@@ -43,6 +43,23 @@ class purchaseController extends Controller
         $items = DB::table('items')->get();
         return view('purchases.purchasewiseitemlist', array('purchaselist' => $list, 'items' => $items, 'net_total' => $net_total, 'items' => $items, 'net_qty' => $net_qty, 'net_pcs' => $net_pcs, 'vendors' => $vendors));
     }
+    public function salewiseitemlist(){
+        $list = DB::table('sales')->join('travel_agents', 'sales.agent_id', '=', 'travel_agents.id')
+        ->where('sales.branch', Auth::user()->branch)
+        ->orderByDesc('sales.id')
+        ->paginate(20);
+    $items = DB::table('items')->get();
+    $net_total = DB::table('sales')->sum('net_total');
+    $net_qty = DB::table('sales')->sum('net_qty');
+    $net_pcs = DB::table('sales')->sum('net_pcs');
+    $vendors = DB::table('vendors')->get();
+   
+    // echo "<pre>";
+    // print_r($list);
+    // exit;
+    $items = DB::table('items')->get();
+    return view('sales.salewiseitemlist', array('salewiseitemlist' => $list, 'items' => $items, 'net_total' => $net_total, 'items' => $items, 'net_qty' => $net_qty, 'net_pcs' => $net_pcs, 'vendors' => $vendors));
+    }
     public function newPurchase()
     {
         $vendors = DB::table('vendors')->select('id', 'name')->where('branch', Auth::user()->branch)->where('status', 1)->get();
